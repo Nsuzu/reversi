@@ -36,3 +36,31 @@ void DrawStone(HDC hdc, int x, int y, int state){
         space - stoneSpace * 2, space - stoneSpace * 2
     );
 }
+
+void SuggestPos(HDC hdc, int x, int y, int score){
+    Gdiplus::Graphics graphics(hdc);
+
+    
+    Gdiplus::FontFamily fontFamily(L"arial");
+    Gdiplus::Font font(&fontFamily, space, Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
+    Gdiplus::PointF pointF(ori[0] + space*x, ori[1] + space*y);
+    Gdiplus::SolidBrush debugBrush(Gdiplus::Color(255, 0, 0, 0));
+
+    switch(score){
+        case 0:
+            graphics.DrawString(L"0", -1, &font, pointF, &debugBrush);
+            break;
+        case 1:
+            graphics.DrawString(L"1", -1, &font, pointF, &debugBrush);
+            break;
+        case 2:
+            graphics.DrawString(L"2", -1, &font, pointF, &debugBrush);
+            break;
+        case 3:
+            graphics.DrawString(L"3", -1, &font, pointF, &debugBrush);
+            break;
+        default:
+            graphics.DrawString(L"-1", -1, &font, pointF, &debugBrush);
+    }
+    
+}

@@ -7,5 +7,6 @@ using namespace Gdiplus;
 
 void DrawBase(HDC);
 void DrawStone(HDC, int, int, int);
+void SuggestPos(HDC, int, int, int);
 
 #endif

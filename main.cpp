@@ -4,36 +4,32 @@
 
 using namespace Gdiplus;
 
-int boardState = 0;
 std::vector<int> clickPos = {0, 0};
 Board board;
 
+
 VOID TestPaint(HDC hdc){
     Gdiplus::Graphics graphics(hdc);
-    
-    //window: 1120 × 630
-    int boardSize = 480;
     Gdiplus::SolidBrush baseGreen(Gdiplus::Color(255, 0, 100, 0));
-    int ori[] = {(1120 - boardSize)/2, (630 - boardSize)/2};
+    const int boardSize = 480, space = boardSize / 8;
+    const int ori[] = {(1120 - boardSize)/2, (630 - boardSize)/2};
+    //window: 1120 × 630
     
-    if(boardState == 0){
-        DrawBase(hdc);
-        boardState++;
-    }
-    
-    int space = boardSize / 8;    
+    DrawBase(hdc);
+   
     std::vector<int> posOnBoard = {clickPos[0] - ori[0], clickPos[1] - ori[1]};
-
     std::vector<int> tile = {posOnBoard[0] / space, posOnBoard[1] / space};
     board.PutStone(tile[0], tile[1]);
 
     for(int i = 0; i < 8; i++){
         for(int j = 0; j < 8; j++){
-            int state = board.GetTileState(i, j);
-            DrawStone(hdc, i, j, state);
+            DrawStone(hdc, i, j, board.GetTileState(i, j));
+            board.CalcTileScore(i, j);
+            
+            if(board.GetTileState(i, j) >= 0) continue;
+            SuggestPos(hdc, i, j, board.GetTileScore(i, j));
         }
     }
-    
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp){
