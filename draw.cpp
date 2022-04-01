@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <gdiplus.h>
+#include "draw.h"
 using namespace Gdiplus;
 
 const int boardSize = 480, space = boardSize / 8;
@@ -12,6 +13,14 @@ void DrawBase(HDC hdc){
     Gdiplus::SolidBrush baseGreen(Gdiplus::Color(255, 0, 100, 0));
     
     graphics.FillRectangle(&baseGreen, ori[0], ori[1], boardSize, boardSize);
+
+    Gdiplus::Pen linePen0(Gdiplus::Color(255, 0, 0, 0), 2);
+    for(int i = 0; i < 9; i++){
+        graphics.DrawLine(&linePen0, ori[0] + space*i, ori[1], ori[0] + space*i, ori[1] + boardSize);
+    }
+    for(int i = 0; i < 9; i++){
+        graphics.DrawLine(&linePen0, ori[0], ori[1] + space*i, ori[0] + boardSize, ori[1] + space*i);
+    }
 }
 
 void DrawStone(HDC hdc, int x, int y, int state){

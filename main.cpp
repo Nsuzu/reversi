@@ -1,23 +1,16 @@
 #include "draw.h"
-#include <vector>
-#include <cassert>
+#include "board.h"
+#include <windowsx.h>
+
 using namespace Gdiplus;
 
 int boardState = 0;
-std::vector<std::vector<int>> level = {
-    {-1, -1, -1, -1, -1, -1, -1, -1},
-    {-1, -1, -1, -1, -1, -1, -1, -1},
-    {-1, -1, -1, -1, -1, -1, -1, -1},
-    {-1, -1, -1, 0, 1, -1, -1, -1},
-    {-1, -1, -1, 1, 0, -1, -1, -1},
-    {-1, -1, -1, -1, -1, -1, -1, -1},
-    {-1, -1, -1, -1, -1, -1, -1, -1},
-    {-1, -1, -1, -1, -1, -1, -1, -1}
-};
+std::vector<int> clickPos = {0, 0};
+Board board;
 
 VOID TestPaint(HDC hdc){
     Gdiplus::Graphics graphics(hdc);
-
+    
     //window: 1120 × 630
     int boardSize = 480;
     Gdiplus::SolidBrush baseGreen(Gdiplus::Color(255, 0, 100, 0));
@@ -28,24 +21,19 @@ VOID TestPaint(HDC hdc){
         boardState++;
     }
     
+    int space = boardSize / 8;    
+    std::vector<int> posOnBoard = {clickPos[0] - ori[0], clickPos[1] - ori[1]};
 
-    Gdiplus::Pen linePen0(Gdiplus::Color(255, 0, 0, 0), 2);
-    int space = boardSize / 8;
-
-    for(int i = 0; i < 9; i++){
-        graphics.DrawLine(&linePen0, ori[0] + space*i, ori[1], ori[0] + space*i, ori[1] + boardSize);
-    }
-    for(int i = 0; i < 9; i++){
-        int space = boardSize / 8;
-        graphics.DrawLine(&linePen0, ori[0], ori[1] + space*i, ori[0] + boardSize, ori[1] + space*i);
-    }
+    std::vector<int> tile = {posOnBoard[0] / space, posOnBoard[1] / space};
+    board.PutStone(tile[0], tile[1]);
 
     for(int i = 0; i < 8; i++){
         for(int j = 0; j < 8; j++){
-            int state = level.at(i).at(j);
+            int state = board.GetTileState(i, j);
             DrawStone(hdc, i, j, state);
         }
     }
+    
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp){
@@ -58,6 +46,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp){
         PostQuitMessage(0);
         return 0;
     case WM_LBUTTONUP:
+        clickPos[0] = GET_X_LPARAM(lp);
+        clickPos[1] = GET_Y_LPARAM(lp);
         PostMessage(hwnd, WM_PAINT, wp, lp);
         InvalidateRect(hwnd, NULL, FALSE);
         return 0;
@@ -114,4 +104,3 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, PSTR, INT iCmdShow){
     GdiplusShutdown(gdiplusToken);
     return msg.wParam;
 }
-
