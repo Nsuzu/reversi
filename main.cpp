@@ -7,7 +7,6 @@ using namespace Gdiplus;
 std::vector<int> clickPos = {0, 0};
 Board board;
 
-
 VOID TestPaint(HDC hdc){
     Gdiplus::Graphics graphics(hdc);
     Gdiplus::SolidBrush baseGreen(Gdiplus::Color(255, 0, 100, 0));
