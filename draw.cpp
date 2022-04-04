@@ -7,12 +7,16 @@ const int boardSize = 480, space = boardSize / 8;
 const int wndWidth = 1120, wndHeight = 630;
 
 const int ori[] = {(wndWidth - boardSize)/2, (wndHeight - boardSize)/2};
+int baseDrawn = 0;
 
 void DrawBase(HDC hdc){
     Gdiplus::Graphics graphics(hdc);
     Gdiplus::SolidBrush baseGreen(Gdiplus::Color(255, 0, 100, 0));
+    if(baseDrawn == 0){
+        graphics.FillRectangle(&baseGreen, ori[0], ori[1], boardSize, boardSize);
+        baseDrawn = 1;
+    }
     
-    graphics.FillRectangle(&baseGreen, ori[0], ori[1], boardSize, boardSize);
 
     Gdiplus::Pen linePen0(Gdiplus::Color(255, 0, 0, 0), 2);
     for(int i = 0; i < 9; i++){
@@ -24,11 +28,19 @@ void DrawBase(HDC hdc){
 }
 
 void DrawStone(HDC hdc, int x, int y, int state){
-    if(state < 0) return;
     const int stoneSpace = 5;
-
     Gdiplus::Graphics graphics(hdc);
     Gdiplus::SolidBrush whiteBrush(Gdiplus::Color(255, 255*state, 255*state, 255*state));
+    Gdiplus::SolidBrush baseGreen(Gdiplus::Color(255, 0, 100, 0));
+    if(state < 0){
+        graphics.FillEllipse(
+            &baseGreen,
+            ori[0] + space*x + stoneSpace, ori[1] + space*y + stoneSpace,
+            space - stoneSpace * 2, space - stoneSpace * 2
+        );
+        return;
+    }
+    
 
     graphics.FillEllipse(
         &whiteBrush,
@@ -38,29 +50,14 @@ void DrawStone(HDC hdc, int x, int y, int state){
 }
 
 void SuggestPos(HDC hdc, int x, int y, int score){
+    if(score <= 0) return;
+    const int stoneSpace = 5;
     Gdiplus::Graphics graphics(hdc);
+    Gdiplus::SolidBrush suggestBrush(Gdiplus::Color(100, 100, 0, 0));
 
-    
-    Gdiplus::FontFamily fontFamily(L"arial");
-    Gdiplus::Font font(&fontFamily, space, Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
-    Gdiplus::PointF pointF(ori[0] + space*x, ori[1] + space*y);
-    Gdiplus::SolidBrush debugBrush(Gdiplus::Color(255, 0, 0, 0));
-
-    switch(score){
-        case 0:
-            graphics.DrawString(L"0", -1, &font, pointF, &debugBrush);
-            break;
-        case 1:
-            graphics.DrawString(L"1", -1, &font, pointF, &debugBrush);
-            break;
-        case 2:
-            graphics.DrawString(L"2", -1, &font, pointF, &debugBrush);
-            break;
-        case 3:
-            graphics.DrawString(L"3", -1, &font, pointF, &debugBrush);
-            break;
-        default:
-            graphics.DrawString(L"-1", -1, &font, pointF, &debugBrush);
-    }
-    
+    graphics.FillEllipse(
+        &suggestBrush,
+        ori[0] + space*x + stoneSpace, ori[1] + space*y + stoneSpace,
+        space - stoneSpace * 2, space - stoneSpace * 2
+    );    
 }
